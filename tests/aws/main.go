@@ -41,7 +41,7 @@ func main() {
 		os.Exit(1)
 	}
 	log.Printf("Importing took %s", time.Since(start))
-	start = time.Now()
+	// start = time.Now()
 	// runTerraform(pathPattern)
 	// log.Printf("Terraform init + plan took %s", time.Since(start))
 }
