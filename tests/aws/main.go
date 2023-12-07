@@ -32,7 +32,7 @@ func main() {
 		"--resources=vpc",
 		"--filter=vpc=vpc-04a062fa9110120a4",
 		"--verbose",
-		"--compact",
+		// "--compact",
 		"--path-pattern=" + pathPattern,
 	})
 	start := time.Now()
