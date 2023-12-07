@@ -23,6 +23,9 @@ import (
 )
 
 func main() {
+	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds | log.Lshortfile)
+	log.SetOutput(os.Stdout)
+
 	tCommand := cmd.NewCmdRoot()
 	pathPattern := "{output}/{provider}/"
 	tCommand.SetArgs([]string{
