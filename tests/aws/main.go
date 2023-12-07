@@ -30,7 +30,7 @@ func main() {
 		"aws",
 		"--regions=ap-southeast-1",
 		"--resources=vpc",
-		"--filter=vpc=vpc-04a062fa9110120a4",
+		"--filter=vpc=vpc-0835c18918ec1f6ab",
 		// "--verbose",
 		// "--compact",
 		"--path-pattern=" + pathPattern,
