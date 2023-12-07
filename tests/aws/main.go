@@ -28,7 +28,7 @@ func main() {
 	tCommand.SetArgs([]string{
 		"import",
 		"aws",
-		"--regions=ap-southeast-1",
+		"--regions=ap-south-1",
 		"--resources=vpc",
 		"--filter=vpc=vpc-0835c18918ec1f6ab",
 		// "--verbose",
