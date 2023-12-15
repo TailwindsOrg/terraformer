@@ -130,7 +130,9 @@ func (r *Resource) Refresh(provider *providerwrapper.ProviderWrapper) {
 	r.InstanceState, err = provider.Refresh(r.InstanceInfo, r.InstanceState)
 	if err != nil {
 		log.Println(err)
+		return 
 	}
+	log.Printf("refresh resource %v\n", r.InstanceState.Attributes["vpc_id"])
 }
 
 func (r Resource) GetIDKey() string {

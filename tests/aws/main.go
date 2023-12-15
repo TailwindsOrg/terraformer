@@ -18,8 +18,9 @@ import (
 	"log"
 	"os"
 	"time"
-
+	//"os/exec"
 	"github.com/GoogleCloudPlatform/terraformer/cmd"
+	//aws_terraforming "github.com/GoogleCloudPlatform/terraformer/providers/aws"
 )
 
 func main() {
@@ -32,10 +33,11 @@ func main() {
 		"import",
 		"aws",
 		"--regions=ap-south-1",
-		"--resources=vpc",
-		"--filter=vpc=vpc-0835c18918ec1f6ab",
-		// "--verbose",
-		// "--compact",
+		"--resources=nat",
+		"--filter=nat=nat-0d448f4c0624c24dc",
+		"--profile=tailwinds",
+		//"--verbose",
+		 "--compact",
 		"--path-pattern=" + pathPattern,
 	})
 	start := time.Now()
@@ -44,30 +46,5 @@ func main() {
 		os.Exit(1)
 	}
 	log.Printf("Importing took %s", time.Since(start))
-	// start = time.Now()
-	// runTerraform(pathPattern)
-	// log.Printf("Terraform init + plan took %s", time.Since(start))
 }
 
-// func runTerraform(pathPattern string) {
-// 	rootPath, _ := os.Getwd()
-// 	provider := &aws_terraforming.AWSProvider{}
-
-// 	currentPath := cmd.Path(pathPattern, provider.GetName(), "", cmd.DefaultPathOutput)
-// 	if err := os.Chdir(currentPath); err != nil {
-// 		log.Println(err)
-// 		os.Exit(1)
-// 	}
-// 	tfCmd := exec.Command("sh", "-c", "terraform init && terraform plan")
-// 	tfCmd.Stdout = os.Stdout
-// 	tfCmd.Stderr = os.Stderr
-// 	err := tfCmd.Run()
-// 	if err != nil {
-// 		log.Println(err)
-// 		os.Exit(1)
-// 	}
-// 	err = os.Chdir(rootPath)
-// 	if err != nil {
-// 		log.Println(err)
-// 	}
-// }

@@ -5,9 +5,10 @@ import (
 	"math/rand"
 	"reflect"
 	"time"
-
+	"strings"
 	"github.com/GoogleCloudPlatform/terraformer/terraformutils/providerwrapper"
 )
+
 
 type ProvidersMapping struct {
 	baseProvider       ProviderGenerator
@@ -121,7 +122,8 @@ func (p *ProvidersMapping) SetResources(resourceToKeep []*Resource) {
 		provider := p.resourceToProvider[resource]
 		if resourcesGroupsByProviders[provider] == nil {
 			resourcesGroupsByProviders[provider] = []Resource{}
-		}
+		} 
+		//log.Printf("resources %v\n", *resource)
 		resourcesGroupsByProviders[provider] = append(resourcesGroupsByProviders[provider], *resource)
 		p.Resources[resource] = true
 	}
@@ -145,15 +147,109 @@ func (p *ProvidersMapping) GetResourcesByService() map[string][]Resource {
 
 	return mapping
 }
+func containsAny(arr []string, target string) bool {
+	for _, str := range arr {
+			if str == target {
+				return true
+			}
+	}
+	return false
+}
 
-func (p *ProvidersMapping) ConvertTFStates(providerWrapper *providerwrapper.ProviderWrapper) {
+func containsString(target, occur string) bool {
+	return strings.Contains(target, occur) 
+}
+
+func (p *ProvidersMapping) ConvertTFStates(providerWrapper *providerwrapper.ProviderWrapper, options map[string]interface{}) {
+	var filter string
+	filter_array, ok := options["Filter"].([]string) 
+	if ok {
+	filter_str := filter_array[0]
+	filter = filter_str[4:]
+	}
+	arr := options["Resources"].([]string)
+	log.Printf("filter %v", filter)
+	if (containsString(filter_array[0], "vpc") && (len(arr) > 1)) {
+	OuterLoop:
 	for resource := range p.Resources {
+		log.Printf("  %v\n", resource.InstanceState.Attributes["vpc_id"])
+		//arr contains the array of resources like vpc, subnet, igw, nat
+		arr := options["Resources"]
+		var values []string
+		// Check if the value is a slice of strings
+		if values, ok := arr.([]string); ok {
+			// It is a slice of strings
+			log.Printf("%v\n", values)
+		} else {
+			// It's not a slice of strings
+			log.Printf("Not a slice of strings")
+		}
+		targets := []string{"subnet", "igw", "nat", "route_table", "vpc"}
+		for _, val := range targets {
+	if containsAny(values, val) {
+		log.Printf("inside if")
+		filter_array, ok := options["Filter"].([]string)
+		if ok {
+			filter_str := filter_array[0]
+			filter = filter_str[4:]
+			log.Printf("filter val is %v\n", filter)
+			var vpc_id string
+			if val == "vpc" {
+				vpc_id = resource.InstanceState.ID
+			} else {
+			vpc_id = resource.InstanceState.Attributes["vpc_id"]
+			}
+			if vpc_id ==  filter {
+				err := resource.ConvertTFstate(providerWrapper)
+		if err != nil {
+			log.Printf("failed to convert resources %s because of error %s", resource.InstanceInfo.Id, err)
+		}
+
+			}
+		} else {
+			continue OuterLoop
+		}
+	} else {
+		err := resource.ConvertTFstate(providerWrapper)
+	if err != nil {
+		log.Printf("failed to convert resources %s because of error %s", resource.InstanceInfo.Id, err)
+	}
+
+	}
+} 
+	} 
+	resourcesGroupsByProviders := map[ProviderGenerator][]Resource{}
+	for resource := range p.Resources {
+		if resource.InstanceState.Attributes["vpc_id"] == filter {
+		provider := p.resourceToProvider[resource]
+		if resourcesGroupsByProviders[provider] == nil {
+			resourcesGroupsByProviders[provider] = []Resource{}
+		}
+		resourcesGroupsByProviders[provider] = append(resourcesGroupsByProviders[provider], *resource)
+	} else if resource.InstanceState.ID == filter {
+			provider := p.resourceToProvider[resource]
+		if resourcesGroupsByProviders[provider] == nil {
+			resourcesGroupsByProviders[provider] = []Resource{}
+		}
+		resourcesGroupsByProviders[provider] = append(resourcesGroupsByProviders[provider], *resource)
+	}
+		//log.Printf("reso %v", *resource)
+	}
+
+	for provider := range p.Providers {
+		provider.GetService().SetResources(resourcesGroupsByProviders[provider])
+	}
+} else {
+	log.Printf("normal flow")
+	for resource := range p.Resources {
+		log.Printf(" nat resources test  %v\n", *resource)
+		log.Printf(" vpc  %v\n", resource.InstanceState.Attributes["vpc_id"])
 		err := resource.ConvertTFstate(providerWrapper)
 		if err != nil {
 			log.Printf("failed to convert resources %s because of error %s", resource.InstanceInfo.Id, err)
 		}
-	}
 
+	} 
 	resourcesGroupsByProviders := map[ProviderGenerator][]Resource{}
 	for resource := range p.Resources {
 		provider := p.resourceToProvider[resource]
@@ -166,6 +262,7 @@ func (p *ProvidersMapping) ConvertTFStates(providerWrapper *providerwrapper.Prov
 	for provider := range p.Providers {
 		provider.GetService().SetResources(resourcesGroupsByProviders[provider])
 	}
+}
 
 }
 

@@ -16,7 +16,7 @@ package aws
 
 import (
 	"context"
-
+	"log"
 	"github.com/GoogleCloudPlatform/terraformer/terraformutils"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -30,14 +30,19 @@ type NatGatewayGenerator struct {
 
 func (g *NatGatewayGenerator) createResources(ngws *ec2.DescribeNatGatewaysOutput) []terraformutils.Resource {
 	var resources []terraformutils.Resource
-	for _, ngw := range ngws.NatGateways {
-		resources = append(resources, terraformutils.NewSimpleResource(
+	for i, ngw := range ngws.NatGateways {
+		log.Printf("i vpc %v %v",i, *ngw.VpcId)
+		resource := terraformutils.NewSimpleResource(
 			StringValue(ngw.NatGatewayId),
 			StringValue(ngw.NatGatewayId),
 			"aws_nat_gateway",
 			"aws",
 			ngwAllowEmptyValues,
-		))
+		)
+		//resource.IgnoreKeys = append(resource.IgnoreKeys, "availability_zone")
+		resource.InstanceState.Attributes["vpc_id"] = *ngw.VpcId
+		log.Printf("nat resource vpcid %v\n", resource.InstanceState.Attributes["vpc_id"])
+		resources = append(resources, resource)
 	}
 
 	return resources
