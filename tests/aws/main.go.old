@@ -32,13 +32,11 @@ func main() {
 		"import",
 		"aws",
 		"--regions=ap-south-1",
-		"--resources=subnet,vpc,route_table,igw,eip,nat",
-		//"--resources=route_table,igw",
-		"--filter=Name=tags.owner;Value=jegan",
-		//"--filter=Name=vpc;Value=vpc-04091db1b44b52c43",
+		"--resources=vpc",
+		"--filter=vpc=vpc-096707575e4b6ddf2",
 		// "--verbose",
-		//"--compact",
-		"--path-pattern=" + pathPattern+"/vpc_gen_final",
+		// "--compact",
+		"--path-pattern=" + pathPattern,
 	})
 	start := time.Now()
 	if err := tCommand.Execute(); err != nil {
