@@ -82,7 +82,6 @@ func newImportCmd() *cobra.Command {
 		_ = providerCommand.MarkPersistentFlagRequired("resources")
 		cmd.AddCommand(providerCommand)
 	}
-	log.Printf("actual command %v\n", cmd)
 	return cmd
 }
 

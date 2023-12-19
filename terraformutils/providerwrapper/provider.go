@@ -158,7 +158,6 @@ func (p *ProviderWrapper) readObjBlocks(block map[string]*configschema.NestedBlo
 }
 
 func (p *ProviderWrapper) Refresh(info *terraform.InstanceInfo, state *terraform.InstanceState) (*terraform.InstanceState, error) {
-	//log.Printf("%v\n%v\n", *info, *state)
 	schema := p.GetSchema()
 	impliedType := schema.ResourceTypes[info.Type].Block.ImpliedType()
 	priorState, err := state.AttrsAsObjectValue(impliedType)
@@ -204,9 +203,7 @@ func (p *ProviderWrapper) Refresh(info *terraform.InstanceInfo, state *terraform
 		msg := fmt.Sprintf("ERROR: Read resource response is null for resource %s", info.Id)
 		return nil, errors.New(msg)
 	}
-	ans := terraform.NewInstanceStateShimmedFromValue(resp.NewState, int(schema.ResourceTypes[info.Type].Version))
-	log.Printf("ans %v\n", ans)
-	return ans, nil
+	return terraform.NewInstanceStateShimmedFromValue(resp.NewState, int(schema.ResourceTypes[info.Type].Version)), nil
 }
 
 func (p *ProviderWrapper) initProvider(verbose bool) error {
