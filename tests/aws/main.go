@@ -34,11 +34,12 @@ func main() {
 		"--regions=ap-south-1",
 		"--resources=subnet,vpc,route_table,igw,eip,nat",
 		//"--resources=route_table,igw",
-		"--filter=Name=tags.owner;Value=jegan",
+		//"--filter=Name=tags.owner;Value=MD",
 		//"--filter=Name=vpc;Value=vpc-04091db1b44b52c43",
+		//"--filter=vpc=vpc-0835c18918ec1f6ab",
 		// "--verbose",
 		//"--compact",
-		"--path-pattern=" + pathPattern+"/vpc_gen_final",
+		"--path-pattern=" + pathPattern,
 	})
 	start := time.Now()
 	if err := tCommand.Execute(); err != nil {

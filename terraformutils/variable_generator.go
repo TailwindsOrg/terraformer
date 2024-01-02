@@ -98,8 +98,8 @@ func GenerateDynamicVariableSet(tfByte []byte) ([]byte, error) {
 					subData = ""
 					//sample subDataMatch
 					//route {
-					re := regexp.MustCompile(MODULEDATAPATTERN)
-					match := re.FindStringSubmatch(line)
+					modPat := regexp.MustCompile(MODULEDATAPATTERN)
+					match := modPat.FindStringSubmatch(line)
 
 					// Extract captured groups
 					if len(match) > 1 {
@@ -137,7 +137,7 @@ func GenerateDynamicVariableSet(tfByte []byte) ([]byte, error) {
 				}
 			} else if subDataMatch {
 				appendStrings += line+"\n"
-				fmt.Println("nooooooooo match: " + line)
+				fmt.Println("no match: " + line)
 				continue
 			}
 		} else {
@@ -153,8 +153,8 @@ func GenerateDynamicVariableSet(tfByte []byte) ([]byte, error) {
 func dynamicResVariableNameFormation(res string) string {
 	//sample res value should be
 	//resource "aws_subnet" "tfer--subnet-00dfb1aa914c8467f
-	re := regexp.MustCompile(RESOURCEPATTERN)
-	matches := re.FindStringSubmatch(res)
+	resPat := regexp.MustCompile(RESOURCEPATTERN)
+	matches := resPat.FindStringSubmatch(res)
 	if len(matches) == 3 {
 		resourceType := matches[1]
 		resourceName := matches[2]
@@ -168,10 +168,10 @@ func dynamicResVariableNameFormation(res string) string {
 func dynamicDataVariableNameFormation(data string) (string, string) {
 	//sample data value should be
 	//enable_dns64 = "false"
-	re := regexp.MustCompile(DATAPATTERN)
-	ree := regexp.MustCompile(SUBDATAPATTERN)
-	matches := re.FindStringSubmatch(data)
-	matchess := ree.FindStringSubmatch(data)
+	dataPat := regexp.MustCompile(DATAPATTERN)
+	sdataPat := regexp.MustCompile(SUBDATAPATTERN)
+	matches := dataPat.FindStringSubmatch(data)
+	matchess := sdataPat.FindStringSubmatch(data)
 	var dataKey, dataValue string
 	if len(matches) > 0 {
 		dataKey = matches[1]
