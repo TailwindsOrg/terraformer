@@ -207,6 +207,8 @@ func hclPrint(data interface{}, mapsObjects map[string]struct{}, sort bool) ([]b
 	formatted = terraform12Adjustments(formatted, mapsObjects)
 	// hack for support terraform 0.13
 	formatted = terraform13Adjustments(formatted)
+	// Generate Variable
+	formatted,_ = GenerateDynamicVariableForResource(formatted)
 	if err != nil {
 		log.Println("Invalid HCL follows:")
 		for i, line := range strings.Split(s, "\n") {
