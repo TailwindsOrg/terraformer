@@ -123,7 +123,6 @@ func (p *ProvidersMapping) SetResources(resourceToKeep []*Resource) {
 		if resourcesGroupsByProviders[provider] == nil {
 			resourcesGroupsByProviders[provider] = []Resource{}
 		}
-		//log.Printf("resources %v\n", *resource)
 		resourcesGroupsByProviders[provider] = append(resourcesGroupsByProviders[provider], *resource)
 		p.Resources[resource] = true
 	}
@@ -185,28 +184,21 @@ func (p *ProvidersMapping) ConvertTFStates(providerWrapper *providerwrapper.Prov
 				log.Printf("Not a slice of strings")
 			}
 			targets := []string{"vpc", "igw", "subnet", "route_table", "nat"}
-			//secondset := []string{"eip","nat"}
 			for _, val := range targets {
 				if containsAny(values, val) {
-					log.Printf("inside if")
 					filter_array, ok := options["Filter"].([]string)
 					if ok {
 						filter_str := filter_array[0]
 						filter = filter_str[4:]
 						var vpc_id string
-						log.Printf("len of ans is %v\n%v\n", len(ans), ans)
 						if val == "vpc" {
 							vpc_id = resource.InstanceState.ID
 						} else if val != "nat" {
 							vpc_id = resource.InstanceState.Attributes["vpc_id"]
 						} else if val == "nat" {
-							log.Printf("nat equal")
 							for _, t := range ans {
 								if t.InstanceInfo.Type == "subnet" {
-									log.Printf("subnet equal")
 									if resource.InstanceState.Attributes["subnet_id"] == t.InstanceInfo.Id {
-										log.Printf("nat found")
-										ans = append(ans, *resource)
 										err := resource.ConvertTFstate(providerWrapper)
 										if err != nil {
 											log.Printf("failed to convert resources %s because of error %s", resource.InstanceInfo.Id, err)
@@ -216,7 +208,6 @@ func (p *ProvidersMapping) ConvertTFStates(providerWrapper *providerwrapper.Prov
 							}
 						}
 						if vpc_id == filter {
-							ans = append(ans, *resource)
 							err := resource.ConvertTFstate(providerWrapper)
 							if err != nil {
 								log.Printf("failed to convert resources %s because of error %s", resource.InstanceInfo.Id, err)
@@ -233,23 +224,7 @@ func (p *ProvidersMapping) ConvertTFStates(providerWrapper *providerwrapper.Prov
 
 				}
 			}
-		}
-		/*for s := range p.Resources {
-			for _, i := range ans {
-				log.Printf("aaaaaaaaa s %v\n%v\n", s.InstanceInfo.Type, i.InstanceInfo.Type)
-				if (s.InstanceInfo.Type == "nat" && (i.InstanceInfo.Type == "subnet")) {
-					if s.InstanceState.Attributes["subnet_id"] == i.InstanceInfo.Id {
-						log.Printf("act_resources s %v\n", *s)
-						ans = append(ans, *s)
-						err := s.ConvertTFstate(providerWrapper)
-				if err != nil {
-					log.Printf("failed to convert resources %s because of error %s", s.InstanceInfo.Id, err)
-				}
-					}
-
-				}
-			}
-		}  */
+		} 
 		resourcesGroupsByProviders := map[ProviderGenerator][]Resource{}
 		for resource := range p.Resources {
 			if resource.InstanceState.Attributes["vpc_id"] == filter {
@@ -273,12 +248,8 @@ func (p *ProvidersMapping) ConvertTFStates(providerWrapper *providerwrapper.Prov
 				log.Printf("else inside")
 				for _, j := range ans {
 					if j.InstanceInfo.Type == "aws_subnet" {
-						log.Printf("inside if")
-						log.Printf("id %v", j.InstanceInfo.Id)
-						log.Printf("sunet id %v\n", resource.InstanceState.Attributes["subnet_id"])
 						val := j.InstanceInfo.Id 
 						if strings.Contains(val,resource.InstanceState.Attributes["subnet_id"]) {
-							log.Printf("match")
 							provider := p.resourceToProvider[resource]
 							if resourcesGroupsByProviders[provider] == nil {
 								resourcesGroupsByProviders[provider] = []Resource{}
@@ -295,8 +266,6 @@ func (p *ProvidersMapping) ConvertTFStates(providerWrapper *providerwrapper.Prov
 	} else {
 		log.Printf("normal flow")
 		for resource := range p.Resources {
-			//log.Printf(" nat resources test  %v\n", *resource)
-			//log.Printf(" vpc  %v\n", resource.InstanceState.Attributes["vpc_id"])
 			err := resource.ConvertTFstate(providerWrapper)
 			if err != nil {
 				log.Printf("failed to convert resources %s because of error %s", resource.InstanceInfo.Id, err)
