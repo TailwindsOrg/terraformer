@@ -130,6 +130,7 @@ func (r *Resource) Refresh(provider *providerwrapper.ProviderWrapper) {
 	r.InstanceState, err = provider.Refresh(r.InstanceInfo, r.InstanceState)
 	if err != nil {
 		log.Println(err)
+		return 
 	}
 }
 

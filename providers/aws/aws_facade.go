@@ -2,6 +2,7 @@ package aws
 
 import (
 	"strings"
+	"log"
 
 	"github.com/GoogleCloudPlatform/terraformer/terraformutils"
 	"github.com/GoogleCloudPlatform/terraformer/terraformutils/providerwrapper"
@@ -21,6 +22,7 @@ func (s *AwsFacade) SetVerbose(verbose bool) {
 }
 
 func (s *AwsFacade) ParseFilters(rawFilters []string) {
+	log.Printf("filter val is %v\n", rawFilters)
 	s.service.ParseFilters(rawFilters)
 }
 
