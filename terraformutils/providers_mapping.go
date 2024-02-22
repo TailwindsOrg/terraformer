@@ -263,6 +263,48 @@ func (p *ProvidersMapping) ConvertTFStates(providerWrapper *providerwrapper.Prov
 		for provider := range p.Providers {
 			provider.GetService().SetResources(resourcesGroupsByProviders[provider])
 		}
+	} else if containsString(filter_array[0], "ec2") && (len(arr) == 1) {
+		log.Printf("ec2 flow")
+		for resource := range p.Resources {
+			log.Printf("resource %v \n%v\n%v", resource, resource.InstanceInfo, resource.InstanceState.Attributes)
+			//arr := options["Resources"]
+					filter_array, ok := options["Filter"].([]string)
+					if ok {
+						filter_str := filter_array[0]
+						filter = filter_str[4:]
+						log.Printf("instance id %v", filter)
+						if resource.InstanceState.ID == filter {
+							err := resource.ConvertTFstate(providerWrapper)
+							if err != nil {
+								log.Printf("failed to convert resources %s because of error %s", resource.InstanceInfo.Id, err)
+							}
+						}
+					} else {
+						continue 
+					}
+				}
+		resourcesGroupsByProviders := map[ProviderGenerator][]Resource{}
+		for resource := range p.Resources {
+			if resource.InstanceState.Attributes["ec2_id"] == filter {
+				ans = append(ans, *resource)
+				provider := p.resourceToProvider[resource]
+				if resourcesGroupsByProviders[provider] == nil {
+					resourcesGroupsByProviders[provider] = []Resource{}
+				}
+				resourcesGroupsByProviders[provider] = append(resourcesGroupsByProviders[provider], *resource)
+			} else if resource.InstanceState.ID == filter {
+				ans = append(ans, *resource)
+				provider := p.resourceToProvider[resource]
+				if resourcesGroupsByProviders[provider] == nil {
+					resourcesGroupsByProviders[provider] = []Resource{}
+				}
+				resourcesGroupsByProviders[provider] = append(resourcesGroupsByProviders[provider], *resource)
+			}
+		} 
+		for provider := range p.Providers {
+			provider.GetService().SetResources(resourcesGroupsByProviders[provider])
+		}
+
 	} else {
 		log.Printf("normal flow")
 		for resource := range p.Resources {
