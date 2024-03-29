@@ -16,7 +16,7 @@ package aws
 
 import (
 	"context"
-
+	"log"
 	"github.com/GoogleCloudPlatform/terraformer/terraformutils"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -29,8 +29,10 @@ type VpcGenerator struct {
 }
 
 func (VpcGenerator) createResources(vpcs *ec2.DescribeVpcsOutput) []terraformutils.Resource {
+	log.Printf("inside create resources vpc")
 	var resources []terraformutils.Resource
 	for _, vpc := range vpcs.Vpcs {
+		log.Printf("%v", vpc.VpcId)
 		resources = append(resources, terraformutils.NewSimpleResource(
 			StringValue(vpc.VpcId),
 			StringValue(vpc.VpcId),
@@ -46,6 +48,7 @@ func (VpcGenerator) createResources(vpcs *ec2.DescribeVpcsOutput) []terraformuti
 // from each vpc create 1 TerraformResource.
 // Need VpcId as ID for terraform resource
 func (g *VpcGenerator) InitResources() error {
+	log.Printf("inside init resources vpc")
 	config, e := g.generateConfig()
 	if e != nil {
 		return e

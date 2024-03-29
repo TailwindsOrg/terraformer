@@ -30,6 +30,7 @@ type SubnetGenerator struct {
 func (SubnetGenerator) createResources(subnets *ec2.DescribeSubnetsOutput) []terraformutils.Resource {
 	var resources []terraformutils.Resource
 	for _, subnet := range subnets.Subnets {
+		//log.Printf("Subnets %v\n", subnet)
 		resource := terraformutils.NewSimpleResource(
 			StringValue(subnet.SubnetId),
 			StringValue(subnet.SubnetId),
@@ -40,6 +41,7 @@ func (SubnetGenerator) createResources(subnets *ec2.DescribeSubnetsOutput) []ter
 		resource.IgnoreKeys = append(resource.IgnoreKeys, "availability_zone")
 		resources = append(resources, resource)
 	}
+	//log.Printf("Resource aws %v\n", resources)
 	return resources
 }
 
@@ -51,8 +53,10 @@ func (g *SubnetGenerator) InitResources() error {
 	if e != nil {
 		return e
 	}
+	//log.Printf("config %v\n", config)
 	svc := ec2.NewFromConfig(config)
 	p := ec2.NewDescribeSubnetsPaginator(svc, &ec2.DescribeSubnetsInput{})
+	//p := ec2.NewDescribeSubnetsPaginator()
 	for p.HasMorePages() {
 		page, err := p.NextPage(context.TODO())
 		if err != nil {

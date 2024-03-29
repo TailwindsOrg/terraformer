@@ -203,7 +203,6 @@ func (p *ProviderWrapper) Refresh(info *terraform.InstanceInfo, state *terraform
 		msg := fmt.Sprintf("ERROR: Read resource response is null for resource %s", info.Id)
 		return nil, errors.New(msg)
 	}
-
 	return terraform.NewInstanceStateShimmedFromValue(resp.NewState, int(schema.ResourceTypes[info.Type].Version)), nil
 }
 

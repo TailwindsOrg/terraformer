@@ -20,7 +20,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
-
+	"github.com/fatih/structs"
 	"github.com/GoogleCloudPlatform/terraformer/terraformutils/terraformerstring"
 
 	"github.com/GoogleCloudPlatform/terraformer/terraformutils/providerwrapper"
@@ -86,6 +86,9 @@ func newImportCmd() *cobra.Command {
 }
 
 func Import(provider terraformutils.ProviderGenerator, options ImportOptions, args []string) error {
+	log.Printf("provider %v\n", provider)
+	log.Printf("options %v\n", options.Filter)
+	log.Printf("args %v\n", args)
 
 	providerWrapper, options, err := initOptionsAndWrapper(provider, options, args)
 	if err != nil {
@@ -99,12 +102,16 @@ func Import(provider terraformutils.ProviderGenerator, options ImportOptions, ar
 		return err
 	}
 
+	mapval := structs.Map(options)
+	log.Printf("mapval %v\n", mapval)
+
 	err = terraformutils.RefreshResourcesByProvider(providerMapping, providerWrapper)
 	if err != nil {
 		return err
 	}
 
-	providerMapping.ConvertTFStates(providerWrapper)
+
+	providerMapping.ConvertTFStates(providerWrapper, mapval)
 	// change structs with additional data for each resource
 	providerMapping.CleanupProviders()
 
@@ -114,6 +121,7 @@ func Import(provider terraformutils.ProviderGenerator, options ImportOptions, ar
 }
 
 func initOptionsAndWrapper(provider terraformutils.ProviderGenerator, options ImportOptions, args []string) (*providerwrapper.ProviderWrapper, ImportOptions, error) {
+
 	err := provider.Init(args)
 	if err != nil {
 		return nil, options, err
