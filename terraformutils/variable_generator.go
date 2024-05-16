@@ -6,6 +6,7 @@ import (
 	"log"
 	"regexp"
 	"strings"
+	"strconv"
 )
 
 const RESOURCEPATTERN = `resource "([^"]+)" "([^"]+)" {`
@@ -36,7 +37,7 @@ func GenerateDynamicVariableSet(tfByte []byte) ([]byte, error) {
 	var varDeclarations string
 	var appendStrings string
 	proceed := false
-	for _, line := range lines {
+	for intval, line := range lines {
 		var dataName string
 		/*fmt.Println("Line: "+line)
 		fmt.Println("RES: "+resourceName)*/
@@ -119,7 +120,8 @@ func GenerateDynamicVariableSet(tfByte []byte) ([]byte, error) {
 						appendStrings += line+"\n"
 						continue
 					}
-					dataName = resourceName + subData + "__" + dataKey
+					dataName = resourceName + subData + "__" + dataKey + "_" + strconv.Itoa(intval)
+					fmt.Println("keyName: %s", dataName)
 					//fmt.Println("insideData" + resourceName + "__" + dataName)
 					varDeclaration := fmt.Sprintf(`variable "%s" {`+"\n"+`  default = "%s"`+"\n"+`}`+"\n\n"+``, dataName, dataVal)
 					//dataNamestr := strings.ReplaceAll(line,`""`,``)
