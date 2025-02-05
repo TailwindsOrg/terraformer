@@ -41,8 +41,6 @@ func main() {
 		//`--filter="Name=name;Value=abinayaaks-VNet"`,
 		// "--verbose",
 		"--compact",
-		//"--verbose",
-		"--compact",
 		"--path-pattern=" + pathPattern,
 	})
 	start := time.Now()
